@@ -24,6 +24,8 @@ class RedditFeedCollection(
         val subredditName: String,
         val sorting: SortType = SortType.HOT,
         val id: String = DigestUtils.md5Hex(subredditName),
-    )
+    ) {
+        fun getRedditUrl(): String = "https://www.reddit.com/r/$subredditName/${sorting.name.lowercase()}/.json"
+    }
 }
 

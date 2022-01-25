@@ -4,24 +4,18 @@ import bilalkilic.com.domain.Article
 import bilalkilic.com.domain.RssFeedCollection
 import bilalkilic.com.infastructure.persistance.get
 import bilalkilic.com.infastructure.persistance.save
-import com.apptastic.rssreader.Item
-import com.apptastic.rssreader.RssReader
 import com.couchbase.lite.Database
 import com.github.siyoon210.ogparser4j.OgParser
-import com.rometools.rome.feed.synd.SyndFeed
+import com.github.siyoon210.ogparser4j.OpenGraph
+import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
 import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.consumeEach
 import java.net.URL
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
 
 class RssFeedCollector(
     private val feedDatabase: Database,
@@ -35,7 +29,7 @@ class RssFeedCollector(
     override val executor: ExecutorService
         get() = Executors.newFixedThreadPool(16 * 2 - 1)
 
-    private val rssItemChannel = Channel<Item>(100)
+    private val rssItemChannel = Channel<SyndEntry>(100)
 
     init {
         launch {
@@ -54,37 +48,38 @@ class RssFeedCollector(
 
         feeds?.map { feed ->
             async {
-                val a =rssReader.read(feed.url).toList()
                 rssReader.build(XmlReader(URL(feed.url))).entries.toList()
             }
         }?.awaitAll()?.flatten()?.forEach {
-            rssItemChannel.send(it)
+            consumeRssItem(it)
         }
     }
 
-    private suspend fun consumeRssItem() {
-        rssItemChannel.consumeEach { item ->
-            val openGraph = runCatching { ogParser.getOpenGraphOf(item.link.unwrap()) }.getOrNull()
+    private fun consumeRssItem(item: SyndEntry) {
+        val openGraph = runCatching { ogParser.getOpenGraphOf(item.link) }.getOrNull()
 
-            val article = if (openGraph != null) {
-                Article.create(
-                    item.link.unwrap() ?: "",
-                    item.title.unwrap() ?: "",
-                    item.description.unwrap() ?: "",
-                    "",
-                    ""
-                )
-            } else {
-                Article.create(
-                    item.link.unwrap() ?: "",
-                    item.title.unwrap() ?: "",
-                    item.description.unwrap() ?: "",
-                    "",
-                    ""
-                )
-            }
-
-            articleDatabase.save(article.id, article)
+        val article = if (openGraph != null) {
+            Article.create(
+                item.link,
+                openGraph.get("title") ?: item.title,
+                openGraph.get("description") ?: item.description?.value,
+                openGraph.get("image"),
+                openGraph.get("site_name"),
+            )
+        } else {
+            Article.create(
+                item.link ?: "",
+                item.title,
+                item.description?.value,
+                "",
+                ""
+            )
         }
-    }
+
+        articleDatabase.save(article.id, article)
+    }k
+}
+
+fun OpenGraph.get(property: String): String? {
+    return runCatching { this.getContentOf(property).value }.getOrNull()
 }

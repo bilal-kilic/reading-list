@@ -11,7 +11,6 @@ fun Application.configureSerialization() {
     }
 }
 
-
 val jsonSerializer = Json {
     ignoreUnknownKeys = true
     encodeDefaults = true

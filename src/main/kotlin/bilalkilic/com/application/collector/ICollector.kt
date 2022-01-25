@@ -21,13 +21,12 @@ interface ICollector : CoroutineScope {
                 block()
                 yield()
             } catch (ex: CancellationException) {
-                println("test")
+                println(ex.printStackTrace())
             } catch (ex: Exception) {
                 println(ex.printStackTrace())
             }
         }
     }
 }
-
 
 fun <T> Optional<T>.unwrap(): T? = this.orElse(null)

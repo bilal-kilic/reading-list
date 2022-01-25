@@ -1,6 +1,7 @@
 package bilalkilic.com.domain
 
 import kotlinx.serialization.Serializable
+import org.apache.commons.codec.digest.DigestUtils
 
 @Serializable
 class RedditArticle private constructor(
@@ -13,11 +14,12 @@ class RedditArticle private constructor(
     val author: String,
     val commentCount: Int,
     val downVotes: Int,
-    val innerHtml: String,
+    val innerHtml: String?,
     val redditUrl: String,
     val subreddit: String,
     val upVotes: Int,
     val clicked: Boolean,
+    override val id: String = DigestUtils.md5Hex(url)
 ) : BaseArticle() {
 
     companion object {
@@ -30,13 +32,13 @@ class RedditArticle private constructor(
             author: String,
             commentCount: Int,
             downVotes: Int,
-            innerHtml: String,
+            innerHtml: String?,
             redditUrl: String,
             subreddit: String,
             upVotes: Int,
             clicked: Boolean,
-        ) {
-            RedditArticle(
+        ): RedditArticle {
+            return RedditArticle(
                 url = url,
                 title = title,
                 description = description,

@@ -1,6 +1,7 @@
 package bilalkilic.com.domain
 
 import kotlinx.serialization.Serializable
+import org.apache.commons.codec.digest.DigestUtils
 
 @Serializable
 class Article private constructor(
@@ -10,14 +11,15 @@ class Article private constructor(
     override val imageUrl: String?,
     override val siteName: String?,
     override val articleType: ArticleType? = ArticleType.ARTICLE,
+    override val id: String = DigestUtils.md5Hex(url)
 ) : BaseArticle() {
 
 
     companion object {
         fun create(
             url: String,
-            title: String,
-            description: String,
+            title: String?,
+            description: String?,
             imageUrl: String?,
             siteName: String?,
         ): Article {

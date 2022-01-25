@@ -12,9 +12,9 @@ sealed class BaseArticle {
     abstract val imageUrl: String?
     abstract val siteName: String?
     abstract val articleType: ArticleType?
+    abstract val id: String
 
     val documentType: String = type
-    val id: String = DigestUtils.md5Hex(this.url)
     var isRead: Boolean = false
     val collectionDate: Long = Instant.now().toEpochMilli()
 
