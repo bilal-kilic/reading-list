@@ -11,7 +11,6 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -45,11 +44,9 @@ class RedditCollector(
                     .data
                     .children
             }
-        }?.awaitAll()
-            ?.flatten()
-            ?.forEach {
-                consumeRssItem(it.data)
-            }
+        }?.awaitAll()?.flatten()?.forEach {
+            consumeRssItem(it.data)
+        }
     }
 
     private fun consumeRssItem(item: RedditResponse.Data.Children.RedditPostData) {

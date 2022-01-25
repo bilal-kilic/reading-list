@@ -38,9 +38,6 @@ class RssFeedCollector(
             }
         }
 
-        launch {
-            consumeRssItem()
-        }
     }
 
     override suspend fun collect() {
@@ -77,7 +74,7 @@ class RssFeedCollector(
         }
 
         articleDatabase.save(article.id, article)
-    }k
+    }
 }
 
 fun OpenGraph.get(property: String): String? {
