@@ -16,7 +16,7 @@ class GetArticlesByPageAsyncHandler(
         val dataSource = DataSource.database(articleDatabase)
         val where = Expression.property("documentType").equalTo(Expression.string(BaseArticle.type))
         if (query.articleType != null) {
-            where.and(Expression.property("articleType").equalTo(Expression.string("redditArticle")))
+            where.and(Expression.property("articleType").equalTo(Expression.string(query.articleType.name)))
         }
 
         if (query.isRead != null) {

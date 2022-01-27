@@ -6,27 +6,31 @@ import bilalkilic.com.domain.RedditFeedCollection
 import bilalkilic.com.infastructure.persistance.get
 import bilalkilic.com.infastructure.persistance.save
 import com.couchbase.lite.Database
-import com.github.siyoon210.ogparser4j.OgParser
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import kotlinx.coroutines.*
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import io.umehara.ogmapper.OgMapper
+import io.umehara.ogmapper.domain.OgTags
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.net.URL
 
+@DelicateCoroutinesApi
 class RedditCollector(
     private val feedDatabase: Database,
     private val articleDatabase: Database,
     private val httpClient: HttpClient,
-    private val ogParser: OgParser,
+    private val ogMapper: OgMapper,
 ) : ICollector {
-    override val job: Job
-        get() = SupervisorJob()
-    override val executor: ExecutorService
-        get() = Executors.newFixedThreadPool(16 * 2 - 1)
+    override val logger: Logger = LoggerFactory.getLogger(RedditCollector::class.java)
 
     init {
-        launch {
+        GlobalScope.launch {
             repeatUntilCancelled {
                 collect()
             }
@@ -34,27 +38,38 @@ class RedditCollector(
     }
 
     override suspend fun collect() {
-        val feeds = feedDatabase.get<RedditFeedCollection>(RedditFeedCollection.type)?.getFeeds()
+        val feeds = feedDatabase.get<RedditFeedCollection>(RedditFeedCollection.type)?.getFeeds() ?: return
 
-        feeds?.map { feed ->
-            async {
-                httpClient
-                    .get(feed.getRedditUrl())
-                    .body<RedditResponse>()
-                    .data
-                    .children
-            }
-        }?.awaitAll()?.flatten()?.forEach {
-            consumeRssItem(it.data)
+        channelFlow {
+            feeds.map { feed ->
+                launch {
+                    val redditData = httpClient
+                        .get(feed.getRedditUrl())
+                        .body<RedditResponse>()
+                        .data
+                        .children
+
+                    redditData.map {
+                        launch {
+                            val article = parseArticle(it.data)
+                            send(article)
+                        }
+                    }.joinAll()
+                }
+            }.joinAll()
+        }.collect { article ->
+            articleDatabase.save(article.id, article)
         }
     }
 
-    private fun consumeRssItem(item: RedditResponse.Data.Children.RedditPostData) {
-        val openGraph = runCatching { ogParser.getOpenGraphOf(item.url) }.getOrNull()
+    private fun parseArticle(item: RedditResponse.Data.Children.RedditPostData): RedditArticle {
+        val ogTags: OgTags? = runCatching {
+            ogMapper.process(URL(item.url))
+        }.getOrNull()
 
-        val imageUrl = openGraph?.get("image") ?: item.media?.thumbnail_url ?: item.getImageInUrl()
+        val imageUrl = ogTags?.image?.toExternalForm() ?: item.media?.thumbnail_url ?: item.getImageInUrl()
 
-        val article = if (item.is_self || openGraph == null) {
+        return if (item.is_self || ogTags == null) {
             RedditArticle.create(
                 url = item.url ?: item.redditUrl(),
                 title = item.title,
@@ -73,11 +88,11 @@ class RedditCollector(
         } else {
             RedditArticle.create(
                 url = item.url ?: item.redditUrl(),
-                title = openGraph.get("title") ?: item.title,
-                description = openGraph.get("description") ?: item.selftext,
+                title = ogTags.title ?: item.title,
+                description = ogTags.description ?: item.selftext,
                 innerHtml = item.selftext_html,
                 imageUrl = imageUrl,
-                siteName = openGraph.get("site_name") ?: "reddit",
+                siteName = ogTags.siteName ?: "reddit",
                 author = item.author,
                 commentCount = item.num_comments,
                 downVotes = item.downs,
@@ -87,8 +102,5 @@ class RedditCollector(
                 clicked = false,
             )
         }
-
-        articleDatabase.save(article.id, article)
     }
-
 }

@@ -55,7 +55,7 @@ dependencies {
     implementation("io.ktor:ktor-client-logging:$ktor_version")
     implementation("io.ktor:ktor-client-logging-jvm:$ktor_version")
     implementation("io.ktor:ktor-client-serialization:$ktor_version")
-    implementation("com.github.siyoon210:ogparser4j:1.0.1")
+    implementation("io.umehara:ogmapper:1.0.0")
     implementation("com.rometools:rome:1.18.0")
 
 }

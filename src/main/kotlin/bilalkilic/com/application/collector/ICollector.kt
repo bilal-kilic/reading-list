@@ -1,17 +1,27 @@
 package bilalkilic.com.application.collector
 
 import kotlinx.coroutines.*
+import org.slf4j.Logger
+import java.time.Duration
 import java.util.*
 import java.util.concurrent.CancellationException
-import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
 interface ICollector : CoroutineScope {
-    val job: Job
-    val executor: ExecutorService
+    val logger: Logger
+
+    val job: CompletableJob
+        get() = SupervisorJob()
+
+    val dispatcher: ExecutorCoroutineDispatcher
+        get() = Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() * 2) - 1).asCoroutineDispatcher()
 
     override val coroutineContext: CoroutineContext
-        get() = job + executor.asCoroutineDispatcher()
+        get() = job + dispatcher
+
+    val delayDuration: Duration
+        get() = Duration.ofMinutes(10)
 
     suspend fun collect()
 
@@ -19,11 +29,12 @@ interface ICollector : CoroutineScope {
         while (isActive) {
             try {
                 block()
-                yield()
             } catch (ex: CancellationException) {
-                println(ex.printStackTrace())
+                logger.error("Worker loop cancelled", ex)
             } catch (ex: Exception) {
-                println(ex.printStackTrace())
+                logger.error("Exception occurred in worker loop", ex)
+            } finally {
+                delay(delayDuration.toMillis())
             }
         }
     }

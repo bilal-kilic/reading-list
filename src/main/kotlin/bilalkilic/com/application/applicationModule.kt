@@ -8,9 +8,10 @@ import bilalkilic.com.application.query.GetAllRedditFeedsAsyncHandler
 import bilalkilic.com.application.query.GetAllRssFeedsAsyncHandler
 import bilalkilic.com.application.query.GetArticlesByPageAsyncHandler
 import com.apptastic.rssreader.RssReader
-import com.github.siyoon210.ogparser4j.OgParser
 import com.rometools.rome.io.SyndFeedInput
 import com.trendyol.kediatr.koin.KediatrKoin.Companion.getCommandBus
+import io.umehara.ogmapper.OgMapper
+import io.umehara.ogmapper.jsoup.JsoupOgMapperFactory
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
@@ -23,12 +24,14 @@ val applicationModule = module {
     single { GetArticlesByPageAsyncHandler(get(named("articleDatabase"))) }
 
     single { RssReader() }
-    single { OgParser() }
+    single {
+        val ogMapper: OgMapper = JsoupOgMapperFactory().build()
+        ogMapper
+    }
     single(createdAtStart = true) {
         RssFeedCollector(
             get(named("feedDatabase")),
             get(named("articleDatabase")),
-            get(),
             get(),
             SyndFeedInput())
     }
