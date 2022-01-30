@@ -1,5 +1,6 @@
-package bilalkilic.com.application.command
+package bilalkilic.com.application.command.handler
 
+import bilalkilic.com.application.command.CreateRssFeedCommand
 import bilalkilic.com.domain.RssFeedCollection
 import bilalkilic.com.infastructure.persistance.get
 import bilalkilic.com.infastructure.persistance.save

@@ -3,10 +3,7 @@ package bilalkilic.com.infastructure.routes.documentation
 import bilalkilic.com.application.command.CreateRedditFeedCommand
 import bilalkilic.com.application.command.CreateRssFeedCommand
 import bilalkilic.com.application.query.model.ArticlePageResponse
-import bilalkilic.com.domain.ArticleType
-import bilalkilic.com.domain.RedditFeedCollection
-import bilalkilic.com.domain.RssFeedCollection
-import bilalkilic.com.domain.SortType
+import bilalkilic.com.domain.*
 import io.bkbn.kompendium.annotations.KompendiumParam
 import io.bkbn.kompendium.annotations.ParamType
 import io.bkbn.kompendium.models.meta.MethodInfo
@@ -49,6 +46,15 @@ val createRedditFeed = MethodInfo.PostInfo<Unit, CreateRedditFeedCommand, Unit>(
     ),
 )
 
+val markPostAsReadParams = MethodInfo.PutInfo<MarkArticleAsReadParams, Unit, Unit>(
+    summary = "Mark article as read",
+    tags = setOf("articles"),
+    responseInfo = ResponseInfo(
+        status = HttpStatusCode.Accepted,
+        ""
+    )
+)
+
 val getArticlesByPageParams = MethodInfo.GetInfo<GetArticlesByPageParams, ArticlePageResponse>(
     summary = "Get articles by page",
     tags = setOf("articles"),
@@ -84,4 +90,8 @@ data class GetArticlesByPageParams(
     @KompendiumParam(ParamType.QUERY) val pageSize: Int,
     @KompendiumParam(ParamType.QUERY) val isRead: Boolean,
     @KompendiumParam(ParamType.QUERY) val articleType: ArticleType,
+)
+
+data class MarkArticleAsReadParams(
+    @KompendiumParam(ParamType.PATH) val id: String,
 )

@@ -57,5 +57,5 @@ dependencies {
     implementation("io.ktor:ktor-client-serialization:$ktor_version")
     implementation("io.umehara:ogmapper:1.0.0")
     implementation("com.rometools:rome:1.18.0")
-
+    implementation("io.github.config4k:config4k:0.4.2")
 }

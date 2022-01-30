@@ -1,5 +1,6 @@
-package bilalkilic.com.application.query
+package bilalkilic.com.infastructure.persistance.query
 
+import bilalkilic.com.application.query.GetAllRedditFeeds
 import bilalkilic.com.domain.RedditFeedCollection
 import bilalkilic.com.infastructure.persistance.get
 import com.couchbase.lite.Database

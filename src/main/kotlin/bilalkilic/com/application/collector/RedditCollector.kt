@@ -3,8 +3,8 @@ package bilalkilic.com.application.collector
 import bilalkilic.com.application.collector.model.RedditResponse
 import bilalkilic.com.domain.RedditArticle
 import bilalkilic.com.domain.RedditFeedCollection
+import bilalkilic.com.infastructure.persistance.ArticleRepository
 import bilalkilic.com.infastructure.persistance.get
-import bilalkilic.com.infastructure.persistance.save
 import com.couchbase.lite.Database
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -23,7 +23,7 @@ import java.net.URL
 @DelicateCoroutinesApi
 class RedditCollector(
     private val feedDatabase: Database,
-    private val articleDatabase: Database,
+    private val articleRepository: ArticleRepository,
     private val httpClient: HttpClient,
     private val ogMapper: OgMapper,
 ) : ICollector {
@@ -58,7 +58,11 @@ class RedditCollector(
                 }
             }.joinAll()
         }.collect { article ->
-            articleDatabase.save(article.id, article)
+            val existingArticle = articleRepository.get(article.id)
+
+            if (existingArticle == null) {
+                articleRepository.save(article)
+            }
         }
     }
 

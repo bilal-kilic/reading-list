@@ -1,5 +1,6 @@
-package bilalkilic.com.application.query
+package bilalkilic.com.infastructure.persistance.query
 
+import bilalkilic.com.application.query.GetAllRssFeeds
 import bilalkilic.com.domain.RssFeedCollection
 import bilalkilic.com.infastructure.persistance.get
 import com.couchbase.lite.Database

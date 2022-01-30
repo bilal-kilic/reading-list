@@ -2,11 +2,12 @@ package bilalkilic.com.application
 
 import bilalkilic.com.application.collector.RedditCollector
 import bilalkilic.com.application.collector.RssFeedCollector
-import bilalkilic.com.application.command.CreateRedditFeedCommandAsyncHandler
-import bilalkilic.com.application.command.CreateRssFeedCommandAsyncHandler
-import bilalkilic.com.application.query.GetAllRedditFeedsAsyncHandler
-import bilalkilic.com.application.query.GetAllRssFeedsAsyncHandler
-import bilalkilic.com.application.query.GetArticlesByPageAsyncHandler
+import bilalkilic.com.application.command.handler.CreateRedditFeedCommandAsyncHandler
+import bilalkilic.com.application.command.handler.CreateRssFeedCommandAsyncHandler
+import bilalkilic.com.application.command.handler.MarkArticleAsReadCommandHandler
+import bilalkilic.com.infastructure.persistance.query.GetAllRedditFeedsAsyncHandler
+import bilalkilic.com.infastructure.persistance.query.GetAllRssFeedsAsyncHandler
+import bilalkilic.com.infastructure.persistance.query.GetArticlesByPageAsyncHandler
 import com.apptastic.rssreader.RssReader
 import com.rometools.rome.io.SyndFeedInput
 import com.trendyol.kediatr.koin.KediatrKoin.Companion.getCommandBus
@@ -22,6 +23,7 @@ val applicationModule = module {
     single { GetAllRedditFeedsAsyncHandler(get(named("feedDatabase"))) }
     single { GetAllRssFeedsAsyncHandler(get(named("feedDatabase"))) }
     single { GetArticlesByPageAsyncHandler(get(named("articleDatabase"))) }
+    single { MarkArticleAsReadCommandHandler(get()) }
 
     single { RssReader() }
     single {
@@ -31,14 +33,14 @@ val applicationModule = module {
     single(createdAtStart = true) {
         RssFeedCollector(
             get(named("feedDatabase")),
-            get(named("articleDatabase")),
+            get(),
             get(),
             SyndFeedInput())
     }
     single(createdAtStart = true) {
         RedditCollector(
             get(named("feedDatabase")),
-            get(named("articleDatabase")),
+            get(),
             get(),
             get(),
         )

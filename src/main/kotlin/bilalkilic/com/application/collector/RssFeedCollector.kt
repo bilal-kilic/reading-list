@@ -2,8 +2,8 @@ package bilalkilic.com.application.collector
 
 import bilalkilic.com.domain.Article
 import bilalkilic.com.domain.RssFeedCollection
+import bilalkilic.com.infastructure.persistance.ArticleRepository
 import bilalkilic.com.infastructure.persistance.get
-import bilalkilic.com.infastructure.persistance.save
 import com.couchbase.lite.Database
 import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.io.SyndFeedInput
@@ -21,7 +21,7 @@ import java.net.URL
 @DelicateCoroutinesApi
 class RssFeedCollector(
     private val feedDatabase: Database,
-    private val articleDatabase: Database,
+    private val articleRepository: ArticleRepository,
     private val ogMapper: OgMapper,
     private val rssReader: SyndFeedInput,
 ) : ICollector {
@@ -53,7 +53,11 @@ class RssFeedCollector(
                 }
             }.joinAll()
         }.collect { article ->
-            articleDatabase.save(article.id, article)
+            val existingArticle = articleRepository.get(article.id)
+
+            if (existingArticle == null) {
+                articleRepository.save(article)
+            }
         }
     }
 
