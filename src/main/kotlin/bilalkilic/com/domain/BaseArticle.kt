@@ -1,5 +1,6 @@
 package bilalkilic.com.domain
 
+import bilalkilic.com.infastructure.plugins.InstantSerializer
 import kotlinx.serialization.Serializable
 import org.apache.commons.codec.digest.DigestUtils
 import java.time.Instant
@@ -13,6 +14,8 @@ sealed class BaseArticle {
     abstract val siteName: String?
     abstract val articleType: ArticleType?
     abstract val id: String
+    @Serializable(with = InstantSerializer::class)
+    abstract val publishedDate: Instant?
 
     val documentType: String = type
     var isRead: Boolean = false

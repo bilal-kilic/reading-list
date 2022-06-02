@@ -19,10 +19,7 @@ class GetArticlesByPageAsyncHandler(
     override suspend fun handleAsync(query: GetArticlesByPage): PageResponse<BaseArticle> {
         val dataSource = DataSource.database(articleDatabase)
         var where = Expression.property("documentType").equalTo(Expression.string(BaseArticle.type))
-
-        if (query.articleType != null) {
-            where = where.and(Expression.property("articleType").equalTo(Expression.string(query.articleType.name)))
-        }
+            .and(Expression.property("articleType").equalTo(Expression.string(ArticleType.ARTICLE.name)))
 
         if (query.isRead != null) {
             where = where.and(Expression.property("isRead").equalTo(Expression.booleanValue(query.isRead)))

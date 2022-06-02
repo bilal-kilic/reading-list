@@ -65,6 +65,16 @@ val getArticlesByPageParams = MethodInfo.GetInfo<GetArticlesByPageParams, Articl
     )
 )
 
+val getRedditArticlesByPageParams = MethodInfo.GetInfo<GetRedditArticlesByPageParams, ArticlePageResponse>(
+    summary = "Get reddit articles by page",
+    tags = setOf("articles"),
+    responseInfo = ResponseInfo(
+        status = HttpStatusCode.OK,
+        "",
+        examples = mapOf("Example" to ArticlePageResponse(0, 0, 0, listOf<RedditArticle>()))
+    )
+)
+
 val getAllRssFeed = MethodInfo.GetInfo<Unit, Collection<RssFeedCollection.RssFeed>>(
     summary = "Get all rss feeds",
     tags = setOf("feeds"),
@@ -94,4 +104,11 @@ data class GetArticlesByPageParams(
 
 data class MarkArticleAsReadParams(
     @KompendiumParam(ParamType.PATH) val id: String,
+)
+
+data class GetRedditArticlesByPageParams(
+    @KompendiumParam(ParamType.QUERY) val page: Int,
+    @KompendiumParam(ParamType.QUERY) val pageSize: Int,
+    @KompendiumParam(ParamType.QUERY) val isRead: Boolean,
+    @KompendiumParam(ParamType.QUERY) val subreddit: String?,
 )

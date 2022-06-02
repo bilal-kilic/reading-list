@@ -15,13 +15,13 @@ interface ICollector : CoroutineScope {
         get() = SupervisorJob()
 
     val dispatcher: ExecutorCoroutineDispatcher
-        get() = Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors() * 2) - 1).asCoroutineDispatcher()
+        get() = Executors.newFixedThreadPool((Runtime.getRuntime().availableProcessors()) - 1).asCoroutineDispatcher()
 
     override val coroutineContext: CoroutineContext
         get() = job + dispatcher
 
     val delayDuration: Duration
-        get() = Duration.ofMinutes(10)
+        get() = Duration.ofMinutes(100)
 
     suspend fun collect()
 

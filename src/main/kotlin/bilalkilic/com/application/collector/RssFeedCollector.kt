@@ -8,6 +8,7 @@ import com.couchbase.lite.Database
 import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
+import com.sun.org.slf4j.internal.LoggerFactory
 import io.umehara.ogmapper.OgMapper
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URL
+import javax.sql.rowset.spi.XmlReader
 
 @DelicateCoroutinesApi
 class RssFeedCollector(
@@ -71,6 +73,7 @@ class RssFeedCollector(
                 ogTags.description ?: item.description?.value,
                 ogTags.image?.toExternalForm(),
                 ogTags.siteName,
+                item.publishedDate?.toInstant()
             )
         } else {
             Article.create(
@@ -78,7 +81,8 @@ class RssFeedCollector(
                 item.title,
                 item.description?.value,
                 "",
-                ""
+                "",
+                item.publishedDate?.toInstant()
             )
         }
     }

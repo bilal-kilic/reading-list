@@ -1,7 +1,9 @@
 package bilalkilic.com.domain
 
+import bilalkilic.com.infastructure.plugins.InstantSerializer
 import kotlinx.serialization.Serializable
 import org.apache.commons.codec.digest.DigestUtils
+import java.time.Instant
 
 @Serializable
 class RedditArticle private constructor(
@@ -11,6 +13,8 @@ class RedditArticle private constructor(
     override val imageUrl: String?,
     override val siteName: String?,
     override val articleType: ArticleType?,
+    @Serializable(with = InstantSerializer::class)
+    override val publishedDate: Instant? = null,
     val author: String,
     val commentCount: Int,
     val downVotes: Int,
@@ -19,7 +23,7 @@ class RedditArticle private constructor(
     val subreddit: String,
     val upVotes: Int,
     val clicked: Boolean,
-    override val id: String = DigestUtils.md5Hex(url)
+    override val id: String = DigestUtils.md5Hex(url),
 ) : BaseArticle() {
 
     companion object {
@@ -37,6 +41,7 @@ class RedditArticle private constructor(
             subreddit: String,
             upVotes: Int,
             clicked: Boolean,
+            publishedDate: Instant?,
         ): RedditArticle {
             return RedditArticle(
                 url = url,
@@ -52,6 +57,7 @@ class RedditArticle private constructor(
                 subreddit = subreddit,
                 upVotes = upVotes,
                 clicked = clicked,
+                publishedDate = publishedDate,
                 articleType = ArticleType.REDDIT
             )
         }

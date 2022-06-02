@@ -8,6 +8,7 @@ import bilalkilic.com.application.command.handler.MarkArticleAsReadCommandHandle
 import bilalkilic.com.infastructure.persistance.query.GetAllRedditFeedsAsyncHandler
 import bilalkilic.com.infastructure.persistance.query.GetAllRssFeedsAsyncHandler
 import bilalkilic.com.infastructure.persistance.query.GetArticlesByPageAsyncHandler
+import bilalkilic.com.infastructure.persistance.query.GetRedditArticlesByPageAsyncHandler
 import com.apptastic.rssreader.RssReader
 import com.rometools.rome.io.SyndFeedInput
 import com.trendyol.kediatr.koin.KediatrKoin.Companion.getCommandBus
@@ -23,6 +24,7 @@ val applicationModule = module {
     single { GetAllRedditFeedsAsyncHandler(get(named("feedDatabase"))) }
     single { GetAllRssFeedsAsyncHandler(get(named("feedDatabase"))) }
     single { GetArticlesByPageAsyncHandler(get(named("articleDatabase"))) }
+    single { GetRedditArticlesByPageAsyncHandler(get(named("articleDatabase"))) }
     single { MarkArticleAsReadCommandHandler(get()) }
 
     single { RssReader() }

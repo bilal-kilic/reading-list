@@ -12,6 +12,7 @@ import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.routing.put
+import okhttp3.Route
 
 fun Route.articleRouting() {
     val commandBus by inject<CommandBus>()
@@ -30,6 +31,17 @@ fun Route.articleRouting() {
             val id = call.parameters["id"] ?: ""
             commandBus.executeCommandAsync(MarkArticleAsReadCommand(id))
             call.respond(HttpStatusCode.OK)
+        }
+
+        route("reddit") {
+            get("", getRedditArticlesByPageParams) {
+                val page = call.parameters["page"]?.toInt() ?: 0
+                val pageSize = call.parameters["pageSize"]?.toInt() ?: 20
+                val isRead = call.parameters["isRead"]?.toBoolean()
+                val subReddit = call.parameters["subreddit"]
+                val articles = commandBus.executeQueryAsync(GetRedditArticlesByPage(page, pageSize, isRead, subReddit))
+                call.respond(HttpStatusCode.OK, articles)
+            }
         }
     }
 }

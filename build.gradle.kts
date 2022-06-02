@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
@@ -5,6 +7,7 @@ val logback_version: String by project
 plugins {
     application
     kotlin("jvm") version "1.6.10"
+    java
     id("org.jetbrains.kotlin.plugin.serialization") version "1.6.10"
 }
 
@@ -18,6 +21,22 @@ repositories {
     mavenCentral()
     maven { url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap") }
     maven { url = uri("https://jcenter.bintray.com") }
+}
+
+tasks {
+    register("fatJar", Jar::class.java) {
+        archiveClassifier.set("all")
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        manifest {
+            attributes("Main-Class" to "bilalkilic.com.ApplicationKt")
+        }
+        from(configurations.runtimeClasspath.get()
+            .onEach { println("add from dependencies: ${it.name}") }
+            .map { if (it.isDirectory) it else zipTree(it) })
+        val sourcesMain = sourceSets.main.get()
+        sourcesMain.allSource.forEach { println("add from sources: ${it.name}") }
+        from(sourcesMain.output)
+    }
 }
 
 dependencies {
@@ -58,4 +77,13 @@ dependencies {
     implementation("io.umehara:ogmapper:1.0.0")
     implementation("com.rometools:rome:1.18.0")
     implementation("io.github.config4k:config4k:0.4.2")
+    implementation(kotlin("stdlib-jdk8"))
+}
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    jvmTarget = "1.8"
+}
+val compileTestKotlin: KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    jvmTarget = "1.8"
 }

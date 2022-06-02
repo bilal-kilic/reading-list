@@ -9,11 +9,9 @@ import org.koin.dsl.module
 
 val couchbaseModule = module {
 
-    single(createdAtStart = true) {
-        CouchbaseLite.init()
-    }
-
     single(named("articleDatabase")) {
+        CouchbaseLite.init()
+
         val config = get<Config>()
         val databaseConfiguration = DatabaseConfiguration().apply {
             this.directory = config.getString("couchbase.directory")
@@ -22,6 +20,8 @@ val couchbaseModule = module {
     }
 
     single(named("feedDatabase")) {
+        CouchbaseLite.init()
+
         val config = get<Config>()
         val databaseConfiguration = DatabaseConfiguration().apply {
             this.directory = config.getString("couchbase.directory")

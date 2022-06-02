@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URL
+import java.time.Instant
 
 @DelicateCoroutinesApi
 class RedditCollector(
@@ -60,9 +61,12 @@ class RedditCollector(
         }.collect { article ->
             val existingArticle = articleRepository.get(article.id)
 
-            if (existingArticle == null) {
-                articleRepository.save(article)
+            if (existingArticle?.isRead == true) {
+                article.markAsRead()
+                article.collectionDate
             }
+
+            articleRepository.save(article)
         }
     }
 
@@ -88,6 +92,7 @@ class RedditCollector(
                 subreddit = item.subreddit,
                 upVotes = item.ups,
                 clicked = false,
+                publishedDate = Instant.ofEpochSecond(item.created_utc.toLong())
             )
         } else {
             RedditArticle.create(
@@ -104,6 +109,7 @@ class RedditCollector(
                 subreddit = item.subreddit,
                 upVotes = item.ups,
                 clicked = false,
+                publishedDate = Instant.ofEpochSecond(item.created_utc.toLong())
             )
         }
     }
