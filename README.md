@@ -11,6 +11,7 @@ Keep in mind that this project is a work on progress especially front-end stuff 
 ## How To Run
 
 Using provided dockercompose.yml just configure volume to provide backend application a directory to store database files.
+Dashboard can be accessed at http:localhost:3000
 
 ``` 
 services:
