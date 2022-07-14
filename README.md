@@ -4,7 +4,9 @@
 
 
 ReadingList is a simple web app designed to collect and trace rss and reddit articles. 
-It is created for personal use to keep track of all the engineering blogs.
+It is created for personal use to keep track of all the engineering blogs. 
+
+Keep in mind that this project is a work on progress especially front-end stuff :)
 
 ## How To Run
 
