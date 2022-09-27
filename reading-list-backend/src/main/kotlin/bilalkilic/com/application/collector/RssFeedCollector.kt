@@ -12,7 +12,6 @@ import io.umehara.ogmapper.OgMapper
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory.getLogger
@@ -37,20 +36,24 @@ class RssFeedCollector(
     }
 
     override suspend fun collect() {
-        val feeds = feedDatabase.get<RssFeedCollection>(RssFeedCollection.type)?.getFeeds() ?: return
+        val feeds = feedDatabase.get<RssFeedCollection>(RssFeedCollection.type)?.getFeeds()?.sortedBy { it.url } ?: return
 
         channelFlow {
             feeds.map { feed ->
                 launch {
-                    val rssItems = rssReader.build(XmlReader(URL(feed.url))).entries.toList()
-                    rssItems.map { item ->
-                        launch {
-                            val article = parseArticle(item)
-                            send(article)
+                    try {
+                        val rssItems = rssReader.build(XmlReader(URL(feed.url))).entries.toList()
+                        rssItems.map { item ->
+                            launch {
+                                val article = parseArticle(item)
+                                send(article)
+                            }
                         }
-                    }.joinAll()
+                    } catch (ex: Exception) {
+                        logger.error("Exception while processing rssFeed ${feed.url}")
+                    }
                 }
-            }.joinAll()
+            }
         }.collect { article ->
             val existingArticle = articleRepository.get(article.id)
 

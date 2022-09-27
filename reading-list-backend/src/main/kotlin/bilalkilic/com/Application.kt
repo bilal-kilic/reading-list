@@ -17,7 +17,7 @@ import io.bkbn.kompendium.routes.openApi
 import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
-import io.ktor.server.plugins.*
+import io.ktor.server.plugins.callloging.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.webjars.*
@@ -40,7 +40,6 @@ fun main() {
         configureSerialization()
         handleExceptions()
         install(HeaderIntercepting)
-        install(DataConversion)
         install(Webjars)
         install(CallLogging)
 
