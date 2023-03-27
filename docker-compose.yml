@@ -11,7 +11,7 @@ services:
       - APP_PORT=6161
       - KTOR_PROFILES_ACTIVE=prod
     volumes:
-      - '/config_path'
+      - '/Users/bilal.kilic/Documents/cb-prod:/app/cb-prod'
   web:
     build: reading-list-web
     ports:
