@@ -39,11 +39,11 @@ export function CollectorSettings() {
 
     const openModal = () => {
         async function fetchRssFeeds() {
-            return await get<RssFeed[]>(`${process.env.BACKEND_URL}/feeds/rss/all`)
+            return await get<RssFeed[]>(`${process.env.REACT_APP_BACKEND_URL}/feeds/rss/all`)
         }
 
         async function fetchRedditFeeds() {
-            return await get<RedditFeed[]>(`${process.env.BACKEND_URL}/feeds/reddit/all`)
+            return await get<RedditFeed[]>(`${process.env.REACT_APP_BACKEND_URL}/feeds/reddit/all`)
         }
 
         fetchRssFeeds().then(response => {
@@ -62,7 +62,7 @@ export function CollectorSettings() {
     }
 
     const addRssFeed = (newRssColumnUrl: string) => {
-        post(`${process.env.BACKEND_URL}/feeds/rss`, new AddRssFeedRequest(newRssColumnUrl), {
+        post(`${process.env.REACT_APP_BACKEND_URL}/feeds/rss`, new AddRssFeedRequest(newRssColumnUrl), {
             headers: {
                 'content-type': 'application/json',
             },
@@ -79,7 +79,7 @@ export function CollectorSettings() {
     };
 
     const deleteRssFeed = (rssFeedId: string) => {
-        fDelete(`${process.env.BACKEND_URL}/feeds/rss/${rssFeedId}`)
+        fDelete(`${process.env.REACT_APP_BACKEND_URL}/feeds/rss/${rssFeedId}`)
         .then(() => {
                 setRssFeeds(rssFeeds.filter(rf => rf.id !== rssFeedId))
             }
@@ -89,7 +89,7 @@ export function CollectorSettings() {
     };
 
     function addNewRedditFeed() {
-        post(`${process.env.BACKEND_URL}/feeds/reddit`, new AddRedditFeedRequest(newSubredditName, redditSortingType), {
+        post(`${process.env.REACT_APP_BACKEND_URL}/feeds/reddit`, new AddRedditFeedRequest(newSubredditName, redditSortingType), {
             headers: {
                 'content-type': 'application/json',
             },
@@ -107,7 +107,7 @@ export function CollectorSettings() {
     }
 
     function deleteRedditFeed(id: string) {
-        fDelete(`${process.env.BACKEND_URL}/feeds/reddit/${id}`)
+        fDelete(`${process.env.REACT_APP_BACKEND_URL}/feeds/reddit/${id}`)
         .then(() => {
                 setRssFeeds(rssFeeds.filter(rf => rf.id !== id))
             }
