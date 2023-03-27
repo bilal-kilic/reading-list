@@ -19,4 +19,5 @@ services:
       - "3000:3000"
     environment:
       - BACKEND_PORT=6161
+      - BACKEND_URL=http://localhost:6161
     container_name: reading-list-web
