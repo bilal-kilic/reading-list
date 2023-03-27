@@ -18,7 +18,7 @@ export function CardWithImage(props: CardProps) {
 
     const markArticleAsRead = () => {
         const articleId = props.article.id
-        put(`http://localhost:6161/articles/${articleId}`)
+        put(`${process.env.BACKEND_URL}/articles/${articleId}`)
         .then(() => {
                 props.onMarkAsRead(articleId)
             }

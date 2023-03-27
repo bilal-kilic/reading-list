@@ -23,9 +23,9 @@ export class ArticleColumn extends React.Component<ArticleColumnProps, ArticleCo
         async function fetchData(page: number = 0, pageSize: number = 20, isRead: boolean = false, articleType: ArticleType, subreddit: string) {
             switch (articleType) {
                 case "ARTICLE":
-                    return get<PageResponse<ArticleDto>>(`http://localhost:6161/articles?articleType=ARTICLE&isRead=${isRead}&page=${page}&pageSize=${pageSize}`)
+                    return get<PageResponse<ArticleDto>>(`${process.env.BACKEND_URL}/articles?articleType=ARTICLE&isRead=${isRead}&page=${page}&pageSize=${pageSize}`)
                 case "REDDIT":
-                    return get<PageResponse<RedditArticleDto>>(`http://localhost:6161/articles/reddit?articleType=REDDIT&isRead=${isRead}&page=${page}&pageSize=${pageSize}&subreddit=${subreddit}`)
+                    return get<PageResponse<RedditArticleDto>>(`${process.env.BACKEND_URL}/articles/reddit?articleType=REDDIT&isRead=${isRead}&page=${page}&pageSize=${pageSize}&subreddit=${subreddit}`)
             }
         }
 

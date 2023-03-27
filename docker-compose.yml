@@ -10,6 +10,7 @@ services:
       - APP_NAME=reading-list
       - APP_PORT=6161
       - KTOR_PROFILES_ACTIVE=prod
+      - BACKEND_URL=http://localhost:6161
     volumes:
       - '/Users/bilal.kilic/Documents/cb-prod:/app/cb-prod'
   web:
